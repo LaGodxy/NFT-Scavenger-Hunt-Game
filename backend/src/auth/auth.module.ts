@@ -8,6 +8,7 @@ import { AuthController } from "./controllers/auth.controller"
 import { AuthService } from "./services/auth.service"
 import { JwtStrategy } from "./strategies/jwt.strategy"
 import { JwtAuthGuard } from "./guards/jwt-auth.guard"
+import { RolesGuard } from "./guards/roles.guard"
 
 @Module({
   imports: [
@@ -19,13 +20,13 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard"
       useFactory: (configService: ConfigService) => ({
         secret: configService.get("JWT_SECRET") || "your-secret-key",
         signOptions: {
-          expiresIn: configService.get("JWT_EXPIRES_IN") || "15m",
+          expiresIn: configService.get("JWT_EXPIRES_IN") || "7d", // Extended for better UX
         },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  exports: [AuthService, JwtAuthGuard, PassportModule],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],
+  exports: [AuthService, JwtAuthGuard, RolesGuard, PassportModule],
 })
 export class AuthModule {}

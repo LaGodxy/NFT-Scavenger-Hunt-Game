@@ -1,20 +1,21 @@
 ### Variables
 @baseUrl = http://localhost:4000
-@userEmail = john.doe@example.com
+@userEmail = alice@example.com
 @userPassword = SecurePass123!
+@walletAddress = 0x742d35Cc6634C0532925a3b8D6Ac17c2db3c2DfF
 
 ### Register a new user
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "name": "John Doe",
+  "name": "Alice Johnson",
   "email": "{{userEmail}}",
   "password": "{{userPassword}}",
-  "username": "john_doe"
+  "username": "alice_johnson"
 }
 
-### Login with registered user
+### Login with email and password
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
@@ -23,13 +24,83 @@ Content-Type: application/json
   "password": "{{userPassword}}"
 }
 
-### Get user profile (requires JWT token from login response)
+### Connect wallet for authentication
+POST {{baseUrl}}/auth/wallet/connect
+Content-Type: application/json
+
+{
+  "walletAddress": "{{walletAddress}}",
+  "signature": "0x123456789abcdef...",
+  "message": "Sign this message to authenticate with NFT Scavenger Hunt Game - Timestamp: 1234567890",
+  "email": "alice.wallet@example.com",
+  "username": "alice_wallet"
+}
+
+### Get user profile (requires JWT token)
 GET {{baseUrl}}/auth/profile
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Update user profile (requires JWT token)
+PUT {{baseUrl}}/auth/profile
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "name": "Alice Johnson Updated",
+  "username": "alice_updated"
+}
+
+### Change password (requires JWT token)
+POST {{baseUrl}}/auth/change-password
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "currentPassword": "{{userPassword}}",
+  "newPassword": "NewSecurePass123!"
+}
+
+### Forgot password
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "{{userEmail}}"
+}
+
+### Reset password
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "RESET_TOKEN_FROM_EMAIL",
+  "newPassword": "NewSecurePass123!"
+}
 
 ### Validate JWT token
 POST {{baseUrl}}/auth/validate-token
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Admin: Get all users (requires admin role)
+GET {{baseUrl}}/auth/admin/users
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Admin: Update user role (requires admin role)
+PUT {{baseUrl}}/auth/admin/users/USER_ID_HERE/role
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "role": "admin"
+}
+
+### Admin: Deactivate user (requires admin role)
+PUT {{baseUrl}}/auth/admin/users/USER_ID_HERE/deactivate
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Admin: Activate user (requires admin role)
+PUT {{baseUrl}}/auth/admin/users/USER_ID_HERE/activate
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
 
 ### Test registration with invalid data
 POST {{baseUrl}}/auth/register
@@ -48,14 +119,4 @@ Content-Type: application/json
 {
   "email": "nonexistent@example.com",
   "password": "wrongpassword"
-}
-
-### Test duplicate registration
-POST {{baseUrl}}/auth/register
-Content-Type: application/json
-
-{
-  "name": "Jane Doe",
-  "email": "{{userEmail}}",
-  "password": "AnotherPass123!"
 }
